@@ -67,6 +67,13 @@ Here's what I've built into this Python script:
 *   **Google Gemini AI Integration:**  I've integrated Google's Gemini API to generate more human-readable and personalized feedback and study recommendations. The prompt is designed to request structured JSON output for easy parsing and display. The feedback incorporates insights from all the analyses performed.
 *   **Structured JSON Output:**  The GenAI output is parsed as JSON, providing structured data for feedback, topic-specific recommendations (with actions), and general recommendations. This makes it easy to use the output in an application.
 *   **Text-Based Fallback:** The script also includes text-based outputs for all analyses and recommendations, serving as a fallback if the GenAI integration has issues or for comparison.
+*   **Advanced Data Visualizations:** Generates insightful visualizations using `matplotlib` and `seaborn`, including:
+    *   Topic-wise Average Accuracy Bar Chart
+    *   Accuracy Trend Line Chart over Quizzes
+    *   Quiz Score Distribution Histogram
+    *   Topic-wise Average Quiz Duration Bar Chart
+    *   Combined Bar Chart Comparing Weakest and Strongest Topics
+    These visualizations are saved as PNG image files for easy inclusion in reports or dashboards.
 *   **Linting and Documentation:** The code is formatted and documented for better readability and maintainability, following Python best practices.
 
 ## Setup Instructions ⚙️
@@ -105,6 +112,8 @@ This project aims to empower students using the NEET Testline app with data-driv
     *   Specific study actions for each weak topic.
     *   General study recommendations.
     *   The output is structured in JSON for easy use in applications.
+    *   **Generating advanced visualizations (bar charts, line charts, histograms) using `matplotlib` and `seaborn` to visually represent topic performance, accuracy trends, score distributions, and quiz durations.**
+        The script then saves these visualizations as PNG image files for easy integration into reports.
 5.  **Output Display:**  The script prints the analysis results, insights, and both the text-based and GenAI-powered recommendations to the console. The JSON output from GenAI is also displayed in a formatted manner.
 
 My approach focuses on combining quantitative data analysis with the natural language generation capabilities of GenAI/NLP to create a truly personalized and helpful learning experience for students.
