@@ -24,7 +24,7 @@ I worked with two main datasets to perform this analysis:
     *   Scores, accuracy, speed, and performance metrics for each quiz
     *   `response_map` for each historical quiz.
 
-These datasets are provided via API endpoints (links will be needed to configure the script).
+These datasets are provided via API endpoints.
 
 ## Task
 
