@@ -124,3 +124,7 @@ As a bonus, I have included:
 
 *   **Student Persona:** Based on the observed performance patterns (currently a basic "Inconsistent Achiever" persona), the script assigns a descriptive persona label. This can be further refined with more sophisticated analysis and potentially ML clustering in the future.
 *   **Creative Labels for Strengths and Weaknesses:**  The script dynamically generates creative and engaging labels for the student's strongest and weakest topic areas, making the feedback more engaging and less dry.
+
+## Code Output Screenshot
+[](https://github.com/Kaos599/Testline_Assignment/blob/main/Output_Screenshot/Code%20output.mp4)
+
