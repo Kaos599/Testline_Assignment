@@ -1,28 +1,50 @@
+"""
+This script analyzes student quiz performance data fetched from web endpoints.
+
+It retrieves historical quiz data, current quiz submission data, and quiz endpoint details.
+The script then performs analysis to identify strong and weak topics, performance trends,
+difficulty level recommendations, and speed vs. accuracy insights.
+
+Finally, it uses Google's Gemini AI API to generate personalized feedback and study
+recommendations in a structured JSON format, incorporating the analysis results.
+The script also provides text-based fallback outputs for insights and recommendations.
+"""
+
 import json
 import requests
-from requests.exceptions import RequestException  
-import os  
-import datetime
-import google.generativeai as genai 
+from requests.exceptions import RequestException
+import os
 from dotenv import load_dotenv
+import google.generativeai as genai
+import datetime
 
-load_dotenv()
-
-
+# --- URLs for endpoints ---
 quiz_endpoint_url = "https://www.jsonkeeper.com/b/LLQT"        
 current_quiz_submission_url = "https://api.jsonserve.com/rJvd7g" 
-historical_quiz_data_url = "https://api.jsonserve.com/XgAgFJ"       
+historical_quiz_data_url = "https://api.jsonserve.com/XgAgFJ"   
 
+# --- Load Environment Variables ---
+load_dotenv()
 
-# --- Function to fetch JSON data from a URL with error handling ---
-def fetch_json_from_url(url):
+def fetch_json_from_url(url: str) -> dict or list or None:
+    """
+    Fetches JSON data from a given URL.
+
+    Args:
+        url: The URL to fetch JSON data from.
+
+    Returns:
+        A dictionary or list representing the parsed JSON data if successful,
+        None if there is an error during the fetching process.
+    """
     try:
         response = requests.get(url)
-        response.raise_for_status()
+        response.raise_for_status()  
         return response.json()
     except RequestException as e:
         print(f"Error fetching data from {url}: {e}")
         return None
+
 
 # --- Fetch Data from URLs ---
 quiz_endpoint_data = fetch_json_from_url(quiz_endpoint_url)
@@ -50,7 +72,7 @@ for quiz_data in historical_quiz_data:
     # --- Time Analysis ---
     started_at_str = quiz_data['started_at']
     ended_at_str = quiz_data['ended_at']
-    started_at_datetime = datetime.datetime.fromisoformat(started_at_str.replace('Z', '+00:00'))  # Handle ISO format
+    started_at_datetime = datetime.datetime.fromisoformat(started_at_str.replace('Z', '+00:00'))
     ended_at_datetime = datetime.datetime.fromisoformat(ended_at_str.replace('Z', '+00:00'))
     duration_seconds = (ended_at_datetime - started_at_datetime).total_seconds()
 
@@ -59,7 +81,7 @@ for quiz_data in historical_quiz_data:
         'accuracy': accuracy,
         'score': score,
         'topic': topic,
-        'duration_seconds': duration_seconds  # Store duration
+        'duration_seconds': duration_seconds
     })
 
     if topic not in topic_performance:
@@ -71,12 +93,12 @@ for quiz_data in historical_quiz_data:
             'lowest_accuracy': 100,
             'total_score': 0.0,
             'avg_score': 0,
-            'total_duration_seconds': 0 # Initialize total duration
+            'total_duration_seconds': 0
         }
     topic_performance[topic]['total_accuracy'] += accuracy
     topic_performance[topic]['count'] += 1
     topic_performance[topic]['total_score'] += score
-    topic_performance[topic]['total_duration_seconds'] += duration_seconds # Add duration to total
+    topic_performance[topic]['total_duration_seconds'] += duration_seconds
     topic_performance[topic]['highest_accuracy'] = max(topic_performance[topic]['highest_accuracy'], accuracy)
     topic_performance[topic]['lowest_accuracy'] = min(topic_performance[topic]['lowest_accuracy'], accuracy)
 
@@ -87,8 +109,7 @@ for quiz_data in historical_quiz_data:
 for topic in topic_performance:
     topic_performance[topic]['avg_accuracy'] = topic_performance[topic]['total_accuracy'] / topic_performance[topic]['count']
     topic_performance[topic]['avg_score'] = topic_performance[topic]['total_score'] / topic_performance[topic]['count']
-    topic_performance[topic]['avg_duration_minutes'] = topic_performance[topic]['total_duration_seconds'] / topic_performance[topic]['count'] / 60 # Avg duration in minutes
-
+    topic_performance[topic]['avg_duration_minutes'] = topic_performance[topic]['total_duration_seconds'] / topic_performance[topic]['count'] / 60
 
 sorted_topic_performance_weakest = sorted(topic_performance.items(), key=lambda item: item[1]['avg_accuracy'])
 sorted_topic_performance_strongest = sorted(topic_performance.items(), key=lambda item: item[1]['avg_accuracy'], reverse=True)
@@ -106,6 +127,8 @@ if len(accuracy_trend) > 1:
         improvement_trend_insight = "Showing improvement in recent quizzes compared to older ones."
     else:
         improvement_trend_insight = "Performance is fluctuating, not showing consistent improvement."
+
+performance_gaps_insight = "Significant performance variation across topics. Strong in some, weak in others."        
 
 # --- Difficulty Level Recommendations ---
 difficulty_recommendations = {}
@@ -139,13 +162,11 @@ current_total_questions = current_quiz_submission_data['total_questions']
 current_time_per_question_seconds = current_duration_seconds / current_total_questions if current_total_questions > 0 else 0
 current_time_per_question_minutes = current_time_per_question_seconds / 60
 
-
-time_per_question_threshold_rush_minutes = 0.20 # Example: 12 seconds per question is rushing - ADJUST THIS THRESHOLD
-if current_time_per_question_minutes < time_per_question_threshold_rush_minutes and current_quiz_accuracy < 60: #Accuracy threshold adjusted to 60%
+time_per_question_threshold_rush_minutes = 0.20  
+if current_time_per_question_minutes < time_per_question_threshold_rush_minutes and current_quiz_accuracy < 60:
     speed_accuracy_insight = f"In your latest quiz, you spent an average of just **{current_time_per_question_minutes:.2f} minutes per question**, completing it quickly, but your accuracy was **{current_quiz_accuracy:.0f}%**. This fast pace might be impacting your accuracy. Consider slowing down slightly to ensure you fully understand each question before answering, especially in topics you find challenging."
 else:
     speed_accuracy_insight = f"Your speed and accuracy in the latest quiz seem balanced. You spent approximately **{current_time_per_question_minutes:.2f} minutes per question** with an accuracy of **{current_quiz_accuracy:.0f}%**. Maintain this approach, adjusting your pace based on the complexity of the topic and questions."
-
 
 print("\n--- Speed vs. Accuracy Analysis ---")
 print(speed_accuracy_insight)
@@ -156,9 +177,8 @@ for topic in weak_areas:
         incorrect_count = topic_incorrect_counts[topic]
         print(f"- Topic: {topic} - Total Incorrect Answers in Past Quizzes: {incorrect_count}")
 
-
 # --- Gen AI Integration (Gemini) ---
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+genai.configure(api_key = os.getenv("GEMINI_API_KEY"))
 
 generation_config = {
     "temperature": 0.9,
@@ -200,7 +220,6 @@ Generate personalized feedback and specific study recommendations for a student 
     -   "recommendations": (array of objects) - Each object represents a weak topic with "topic" (string - topic name) and "actions" (array of strings - study actions) keys.
     -   "general_recommendations": (array of strings) - General study recommendations.
 
-
 **Example JSON Response Structure:**
 ```json
 {{
@@ -217,7 +236,8 @@ Generate personalized feedback and specific study recommendations for a student 
     // ... more weak topics as needed
   ],
   "general_recommendations": ["General recommendation 1", "General recommendation 2", ...]
-}}"""
+}}
+"""
 response_gen_ai = chat_session.send_message(prompt_gen_ai)
 
 try:
@@ -249,14 +269,15 @@ except json.JSONDecodeError:
     print("Could not decode JSON response from Gen AI. Displaying raw text response:")
     print(response_gen_ai.text)
 
-# --- (Optional) Keep the older text-based insights and recommendations for comparison or fallback ---
+# --- Insights/Stats ---
 print("\n--- Analysis of Student Performance (Text-Based - Fallback) ---")
 print("\nTopic-wise Performance:")
+
 for topic, perf in sorted_topic_performance_weakest:
     print(f"- Topic: {topic}")
     print(f" Average Accuracy: {perf['avg_accuracy']:.2f}%")
     print(f" Average Score: {perf['avg_score']:.2f}")
-    print(f" Average Duration: {perf['avg_duration_minutes']:.2f} minutes") # Print average duration
+    print(f" Average Duration: {perf['avg_duration_minutes']:.2f} minutes")
     print(f" Highest Accuracy: {perf['highest_accuracy']:.2f}%")
     print(f" Lowest Accuracy: {perf['lowest_accuracy']:.2f}%")
     print("-" * 30)
@@ -293,3 +314,4 @@ weaknesses_label = "Needs Improvement: Requires focus on " + ', '.join(weak_area
 print(f"Persona: {persona_label}")
 print(f"Strengths Insight: {strengths_label}")
 print(f"Weaknesses Insight: {weaknesses_label}")
+
