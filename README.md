@@ -126,5 +126,5 @@ As a bonus, I have included:
 *   **Creative Labels for Strengths and Weaknesses:**  The script dynamically generates creative and engaging labels for the student's strongest and weakest topic areas, making the feedback more engaging and less dry.
 
 ## Code Output Screenshot
-[](https://github.com/Kaos599/Testline_Assignment/blob/main/Output_Screenshot/Code%20output.mp4)
+![]((https://github.com/Kaos599/Testline_Assignment/blob/main/Output_Screenshot/Output.gif))
 
