@@ -307,14 +307,57 @@ print("\n--- Recommendations (Text-Based - Fallback) ---")
 for i, rec in enumerate(recommendations, 1):
     print(f"{i}. {rec}")
 
-print("\n--- Bonus Points: Student Persona (Text-Based - Fallback) ---")
-persona_label = "Inconsistent Achiever"
-strengths_label = "Topic Strengths: Excels in topics like " + ', '.join(strong_areas)
-weaknesses_label = "Needs Improvement: Requires focus on " + ', '.join(weak_areas)
+# --- Prepare data for Persona calculation (moved from Visualization section) ---
+topics = list(topic_performance.keys())
+avg_accuracies = [perf['avg_accuracy'] for perf in topic_performance.values()]    
+
+# --- Bonus Points: Student Persona ---
+print("\n--- Bonus Points: Student Persona ---")
+
+overall_avg_accuracy = sum(avg_accuracies) / len(avg_accuracies) if avg_accuracies else 0
+performance_gap = 0 # Initialize performance_gap
+if sorted_topic_performance_strongest and sorted_topic_performance_weakest:
+    best_topic_accuracy = sorted_topic_performance_strongest[0][1]['avg_accuracy']
+    worst_topic_accuracy = sorted_topic_performance_weakest[0][1]['avg_accuracy']
+    performance_gap = best_topic_accuracy - worst_topic_accuracy
+
+
+time_per_question_threshold_fast_minutes = 0.25 
+time_per_question_threshold_slow_minutes = 0.5  
+
+persona_label = "Inconsistent Achiever" 
+strengths_label = ""
+weaknesses_label = ""
+
+if overall_avg_accuracy >= 85:
+    persona_label = "Master Achiever"
+    strengths_label = "Mastery Domains: Excels across a wide range of topics."
+    weaknesses_label = "Refinement Areas: Minor areas for improvement to reach complete mastery."
+elif current_time_per_question_minutes < time_per_question_threshold_fast_minutes and overall_avg_accuracy >= 60:
+    persona_label = "Speed Focused Learner"
+    strengths_label = "Swift Solver: Excellent quiz completion speed; excels under time pressure."
+    weaknesses_label = "Accuracy Boost Needed: Can enhance scores by focusing on accuracy and careful review."
+elif current_time_per_question_minutes > time_per_question_slow_minutes and overall_avg_accuracy >= 80:
+    persona_label = "Accuracy Seeker"
+    strengths_label = "Precision Pro: Prioritizes accuracy and demonstrates strong conceptual understanding."
+    weaknesses_label = "Pace Optimization: Could benefit from slightly increasing speed without sacrificing accuracy."
+elif performance_gap >= 40 and overall_avg_accuracy >= 60:
+    persona_label = "Topic Varied Performer"
+    strengths_label = "Topic Strengths: Demonstrates strong grasp in specific topics like " + ', '.join(strong_areas)
+    weaknesses_label = "Topic Gaps: Needs to bridge performance gaps in topics like " + ', '.join(weak_areas)
+elif overall_avg_accuracy < 60: 
+    persona_label = "Needs Support Learner"
+    strengths_label = "Developing Potential: Showing effort and engagement through quiz participation."
+    weaknesses_label = "Foundational Focus Required: Needs to strengthen foundational concepts across key topics."
+else: 
+    persona_label = "Inconsistent Achiever"
+    strengths_label = "Variable Strengths: Shows potential in some topics, but performance varies."
+    weaknesses_label = "Inconsistent Performance: Needs to stabilize performance across all topics."
+
+
 print(f"Persona: {persona_label}")
 print(f"Strengths Insight: {strengths_label}")
 print(f"Weaknesses Insight: {weaknesses_label}")
-
 
 # --- Visualization Section ---
 import matplotlib.pyplot as plt
