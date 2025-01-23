@@ -6,7 +6,7 @@
 
 This project is my solution to provide personalized study recommendations for students using the NEET Testline app. I've built a Python script that analyzes quiz performance data and leverages the power of Google's Gemini AI to deliver actionable insights and recommendations, helping students focus their preparation effectively.
 
-[![Video Demo](https://raw.githubusercontent.com/Kaos599/Testline_Assignment/main/Output_Screenshot/Screenshot%202025-01-23%20180405.png)](https://www.youtube.com/watch?v=ILYpm-C68nQ)
+[[Video Demo]](https://www.youtube.com/watch?v=ILYpm-C68nQ)
 ## Data Overview
 
 I worked with two main datasets to perform this analysis:
