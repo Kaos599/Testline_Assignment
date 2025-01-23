@@ -315,3 +315,108 @@ print(f"Persona: {persona_label}")
 print(f"Strengths Insight: {strengths_label}")
 print(f"Weaknesses Insight: {weaknesses_label}")
 
+
+# --- Visualization Section ---
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+plt.ion()
+
+print("\n--- Generating Visualizations ---")
+
+# 1. Topic-wise Average Accuracy - Bar Chart
+topics = list(topic_performance.keys())
+avg_accuracies = [perf['avg_accuracy'] for perf in topic_performance.values()]
+
+plt.figure(figsize=(12, 6)) 
+sns.barplot(x=topics, y=avg_accuracies, palette="viridis", hue=topics, legend=False)
+plt.xlabel("Topics")
+plt.ylabel("Average Accuracy (%)")
+plt.title("Topic-wise Average Quiz Accuracy")
+plt.xticks(rotation=45, ha="right") 
+plt.tight_layout() 
+plt.savefig("topic_accuracy_bar_chart.png") 
+print("Generated: topic_accuracy_bar_chart.png")
+# plt.show()  # Uncomment plt.show() if you want to display the plot interactively (for testing, not for script output)
+plt.close()
+
+
+# 2. Accuracy Trend Over Time - Line Chart
+accuracy_trend_dates = [datetime.datetime.fromisoformat(p['submitted_at']).strftime('%Y-%m-%d') for p in performance_history] 
+accuracy_values = [p['accuracy'] for p in performance_history]
+
+plt.figure(figsize=(10, 5))
+plt.plot(accuracy_trend_dates, accuracy_values, marker='o', linestyle='-', color='skyblue') 
+plt.xlabel("Quiz Submission Date")
+plt.ylabel("Accuracy (%)")
+plt.title("Quiz Accuracy Trend Over Time")
+plt.xticks(rotation=45, ha="right")
+plt.grid(axis='y', linestyle='--') 
+plt.tight_layout()
+plt.savefig("accuracy_trend_line_chart.png")
+print("Generated: accuracy_trend_line_chart.png")
+# plt.show()
+plt.close()
+
+
+# 3. Quiz Score Distribution - Histogram
+quiz_scores = [p['score'] for p in performance_history]
+
+plt.figure(figsize=(8, 5))
+sns.histplot(quiz_scores, bins=10, kde=True, color='lightcoral') #
+plt.xlabel("Quiz Score")
+plt.ylabel("Frequency")
+plt.title("Distribution of Quiz Scores")
+plt.tight_layout()
+plt.savefig("quiz_score_distribution_histogram.png")
+print("Generated: quiz_score_distribution_histogram.png")
+plt.close()
+
+
+# 4. Topic-wise Average Quiz Duration - Bar Chart
+topic_durations = [perf['avg_duration_minutes'] for perf in topic_performance.values()]
+
+plt.figure(figsize=(12, 6))
+sns.barplot(x=topics, y=topic_durations, palette="mako", hue=topics, legend=False) 
+plt.xlabel("Topics")
+plt.ylabel("Average Quiz Duration (Minutes)")
+plt.title("Topic-wise Average Quiz Duration")
+plt.xticks(rotation=45, ha="right")
+plt.tight_layout()
+plt.savefig("topic_quiz_duration_bar_chart.png")
+print("Generated: topic_quiz_duration_bar_chart.png")
+plt.close()
+
+
+# 5. Combined Bar Chart: Weakest vs. Strongest Topics - (Top 3 of each)
+weakest_topics_names = [topic for topic, perf in sorted_topic_performance_weakest[:3]]
+weakest_topics_accuracies = [topic_performance[topic]['avg_accuracy'] for topic in weakest_topics_names]
+strongest_topics_names = [topic for topic, perf in sorted_topic_performance_strongest[:3]]
+strongest_topics_accuracies = [topic_performance[topic]['avg_accuracy'] for topic in strongest_topics_names]
+
+combined_topics_names = weakest_topics_names + strongest_topics_names
+combined_topics_accuracies = weakest_topics_accuracies + strongest_topics_accuracies
+topic_categories = ['Weakest'] * 3 + ['Strongest'] * 3 
+
+df_combined = pd.DataFrame({ 
+    'Topic': combined_topics_names,
+    'Average Accuracy': combined_topics_accuracies,
+    'Category': topic_categories
+})
+
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Topic', y='Average Accuracy', hue='Category', data=df_combined, palette=['#f05555', '#44bb44']) 
+plt.xlabel("Topics")
+plt.ylabel("Average Accuracy (%)")
+plt.title("Comparison: Average Accuracy - Weakest vs. Strongest Topics")
+plt.xticks(rotation=45, ha="right")
+plt.legend(title="Topic Category") 
+plt.tight_layout()
+plt.savefig("weak_vs_strong_topics_bar_chart.png")
+print("Generated: weak_vs_strong_topics_bar_chart.png")
+plt.close()
+
+
+print("--- All Visualizations Generated and Saved as PNG files ---")
