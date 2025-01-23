@@ -90,7 +90,7 @@ if len(accuracy_trend) > 1:
 
 
 
-genai.configure(api_key=os.environ["AIzaSyBQBlRTuwDXVmVEj0hJ4ErV4J6wP9ei860"])
+genai.configure(api_key="AIzaSyBQBlRTuwDXVmVEj0hJ4ErV4J6wP9ei860")
 
 
 generation_config = {
@@ -186,4 +186,37 @@ for topic, perf in sorted_topic_performance_weakest:
     print(f" Average Accuracy: {perf['avg_accuracy']:.2f}%")
     print(f" Average Score: {perf['avg_score']:.2f}")
     print(f" Highest Accuracy: {perf['highest_accuracy']:.2f}%")
-    print(f" Lowest Accuracy: {perf['lowest_accuracy']:.
+    print(f" Lowest Accuracy: {perf['lowest_accuracy']:.2f}%")
+    print("-" * 30)
+
+print("\nStrongest Topics:")
+print(", ".join(strong_areas))
+print("\nWeakest Topics:")
+print(", ".join(weak_areas))
+print("\nPerformance Trend (Accuracy):", accuracy_trend)
+print("Performance Trend (Score):", score_trend)
+
+print("\n--- Insights (Text-Based - Fallback) ---")
+print(f"Weak Areas: {', '.join(weak_areas)}")
+print(f"Strong Areas: {', '.join(strong_areas)}")
+print(f"Improvement Trend: {improvement_trend_insight}")
+
+recommendations = [
+    f"Focus on improving in the weak areas: {', '.join(weak_areas)}.",
+    f"Revisit the concepts of {', '.join(weak_areas)} topics.",
+    "Practice more quizzes specifically on the weak topics.",
+    "Analyze incorrect answers in quizzes to understand mistakes.",
+    "Maintain consistency in performance across all topics."
+]
+
+print("\n--- Recommendations (Text-Based - Fallback) ---")
+for i, rec in enumerate(recommendations, 1):
+    print(f"{i}. {rec}")
+
+print("\n--- Bonus Points: Student Persona (Text-Based - Fallback) ---")
+persona_label = "Inconsistent Achiever"  
+strengths_label = "Topic Strengths: Excels in topics like " + ', '.join(strong_areas)  
+weaknesses_label = "Needs Improvement: Requires focus on " + ', '.join(weak_areas)  
+print(f"Persona: {persona_label}")
+print(f"Strengths Insight: {strengths_label}")
+print(f"Weaknesses Insight: {weaknesses_label}")
